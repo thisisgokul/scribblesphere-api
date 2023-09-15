@@ -45,7 +45,7 @@ const login = async (req, res) => {
         id: userDoc._id
       }, process.env.JWT_SECRET, { expiresIn: '3h' }, (err, token) => {
         if (err) throw err;
-        res.json("token",token);
+        res.json(token);
         res.cookie('token', token, { secure: true, httpOnly: true }).json(userDoc);
       });
     } else {
