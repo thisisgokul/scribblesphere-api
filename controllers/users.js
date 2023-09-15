@@ -33,54 +33,41 @@ const signup = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  
 
-  try {
-    const userDoc = await User.findOne({ email }).exec();
-
-    if (!userDoc) {
-      return res.status(404).json({ error: 'User not found' });
+  const {email,password} = req.body;
+  const userDoc = await User.findOne({email});
+  if (userDoc) {
+    const passOk = bcrypt.compareSync(password, userDoc.password);
+    if (passOk) {
+      jwt.sign({
+        email:userDoc.email,
+        id:userDoc._id
+      }, process.env.JWT_SECRET, {}, (err,token) => {
+        if (err) throw err;
+        res.cookie('token', token).json(userDoc);
+      });
+    } else {
+      res.status(422).json('pass not ok');
     }
-
-    const passOK = bcrypt.compareSync(password, userDoc.password);
-
-    if (!passOK) {
-      return res.status(401).json({ error: 'Incorrect password' });
-    }
-
-    const token = jwt.sign(
-      { email: userDoc.email, id: userDoc._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '96h' }
-    );
-    
-    res.cookie('token', token).json(userDoc);
-
-  } catch (error) {
-    res.status(500).json({ error: 'An error occurred during login' });
+  } else {
+    res.json('not found');
   }
 };
 
 
 const profile = async (req, res) => {
-  const { token } = req.cookies;
+ 
 
-  try {
-    if (!token) {
-      return res.json(null);
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const { name, email, _id } = user;
-    res.json({ name, email, _id });
-  } catch (error) {
-    res.status(500).json({ error: 'An error occurred while fetching profile' });
+  const {token} = req.cookies;
+  if (token) {
+    jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
+      if (err) throw err;
+      const {name,email,_id} = await User.findById(userData.id);
+      res.json({name,email,_id});
+    });
+  } else {
+    res.json(null);
   }
 };
 
