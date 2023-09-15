@@ -12,8 +12,10 @@ const app = express();
 
 // Middleware
 
-app.use(cors());
-
+app.use(cors({
+  credentials: true,
+  origin: 'https://scribblesphere.onrender.com'
+}));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieparser())
