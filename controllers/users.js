@@ -33,30 +33,28 @@ const signup = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  
+  const { email, password } = req.body;
+  const userDoc = await User.findOne({ email });
 
-  const {email,password} = req.body;
-  const userDoc = await User.findOne({email});
   if (userDoc) {
     const passOk = bcrypt.compareSync(password, userDoc.password);
+    
     if (passOk) {
       jwt.sign({
         email: userDoc.email,
         id: userDoc._id
-      }, process.env.JWT_SECRET, {}, (err, token) => {
-        if (err) {
-          console.error(err);
-          throw err; 
-        }
-        res.cookie('token', token).json(userDoc);
+      }, process.env.JWT_SECRET, { expiresIn: '3h' }, (err, token) => {
+        if (err) throw err;
+        res.cookie('token', token, { secure: true, httpOnly: true }).json(userDoc);
       });
     } else {
-      res.status(422).json('pass not ok');
+      res.status(422).json('Password not ok');
     }
   } else {
-    res.json('not found');
+    res.json('User not found');
   }
 };
+
 
 
 const profile = async (req, res) => {
