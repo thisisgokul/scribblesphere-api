@@ -34,42 +34,47 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  const userDoc = await User.findOne({ email });
-
-  if (userDoc) {
-    const passOk = bcrypt.compareSync(password, userDoc.password);
-    
-    if (passOk) {
-      jwt.sign({
-        email: userDoc.email,
-        id: userDoc._id
-      }, process.env.JWT_SECRET, { expiresIn: '3h' }, (err, token) => {
-        if (err) throw err;
-        res.json(token);
-        res.cookie('token', token, { secure: true, httpOnly: true }).json(userDoc);
-      });
-    } else {
-      res.status(422).json('Password not ok');
+  
+  try {
+    const userDoc = await User.findOne({ email }).exec();
+  
+    if (!userDoc) {
+      return res.status(404).json({ error: 'User not found' });
     }
-  } else {
-    res.json('User not found');
+  
+    const passOK = bcrypt.compareSync(password, userDoc.password);
+  
+    if (!passOK) {
+      return res.status(401).json({ error: 'Incorrect password' });
+    }
+  
+    const token = jwt.sign({ email: userDoc.email, id: userDoc._id }, process.env.JWT_SECRET);
+  
+    res.cookie('token', token).json({ token, user: userDoc });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred during login' });
   }
 };
 
-
-
 const profile = async (req, res) => {
+  const { token } = req.cookies;
  
-
-  const {token} = req.cookies;
-  if (token) {
-    jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
-      if (err) throw err;
-      const {name,email,_id} = await User.findById(userData.id);
-      res.json({name,email,_id});
-    });
-  } else {
-    res.json(null);
+  try {
+    if (!token) {
+      return res.json(null);
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const { name, email, _id } = user;
+    res.json({ name, email, _id });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while fetching profile' });
   }
 };
 
