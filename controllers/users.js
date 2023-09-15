@@ -53,8 +53,8 @@ const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '96h' }
     );
-
-    res.cookie('token', token, { maxAge: 96 * 60 * 60 * 1000, httpOnly: true }).json(userDoc);
+    
+    res.cookie('token', token).json(userDoc);
 
   } catch (error) {
     res.status(500).json({ error: 'An error occurred during login' });
