@@ -49,8 +49,9 @@ const login = async (req, res) => {
     }
   
     const token = jwt.sign({ email: userDoc.email, id: userDoc._id }, process.env.JWT_SECRET);
-  
-    res.cookie('token', token).json({ token, user: userDoc });
+    
+    res.cookie('token', token, { httpOnly: true, secure: true }).json(userDoc);
+
   } catch (error) {
     res.status(500).json({ error: 'An error occurred during login' });
   }
