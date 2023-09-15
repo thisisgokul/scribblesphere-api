@@ -41,10 +41,13 @@ const login = async (req, res) => {
     const passOk = bcrypt.compareSync(password, userDoc.password);
     if (passOk) {
       jwt.sign({
-        email:userDoc.email,
-        id:userDoc._id
-      }, process.env.JWT_SECRET, {}, (err,token) => {
-        if (err) throw err;
+        email: userDoc.email,
+        id: userDoc._id
+      }, process.env.JWT_SECRET, {}, (err, token) => {
+        if (err) {
+          console.error(err);
+          throw err; 
+        }
         res.cookie('token', token).json(userDoc);
       });
     } else {
