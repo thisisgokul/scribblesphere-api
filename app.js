@@ -28,15 +28,11 @@ mongooseConnect();
 app.use('/', userRoutes);
 
 if (process.env.NODE_ENV === 'production') {
-  const __dirname = path.resolve();
-  app.use(express.static(path.join(__dirname, '/scribblesphere/dist')));
+ 
+  app.use(express.static('scribblesphere/build'));
 
-  app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, 'scribblesphere', 'dist', 'index.html'))
-  );
-} else {
-  app.get('/', (req, res) => {
-    res.send('API is running....');
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'scribblesphere', 'build', 'index.html'));
   });
 }
 
