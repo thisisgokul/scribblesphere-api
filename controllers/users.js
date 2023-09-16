@@ -4,6 +4,13 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 dotenv.config();
 
+
+const cookieOptions={
+  httpOnly:true,
+  secure:true,
+  sameSite:'None',
+};
+
 const getAll = (req, res) => {
   console.log('success');
   res.send('test');
@@ -50,7 +57,7 @@ const login = async (req, res) => {
   
     const token = jwt.sign({ email: userDoc.email, id: userDoc._id }, process.env.JWT_SECRET);
     
-    res.cookie('token', token, { httpOnly: true, secure: true }).json(userDoc);
+    res.cookie('token', token, cookieOptions).json(userDoc);
 
   } catch (error) {
     res.status(500).json({ error: 'An error occurred during login' });
