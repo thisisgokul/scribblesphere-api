@@ -5,6 +5,7 @@ const cookieparser=require('cookie-parser');
 const mongooseConnect=require("./config/config")
 const userRoutes = require('./routes/routes');
 const dotenv = require('dotenv');
+const path = require('path');
 const port = 5000;
 dotenv.config();
 
