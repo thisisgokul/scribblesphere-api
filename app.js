@@ -30,10 +30,10 @@ app.use('/', userRoutes);
 
 if (process.env.NODE_ENV === 'production') {
  
-  app.use(express.static('scribbleSphere/build'));
+  app.use(express.static('scribblesphere/build'));
 
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'scribbleSphere', 'build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, 'scribblesphere', 'build', 'index.html'));
   });
 }
 
