@@ -4,9 +4,9 @@ const cors = require('cors');
 const cookieparser=require('cookie-parser');
 const mongooseConnect=require("./config/config")
 const userRoutes = require('./routes/routes');
+const dotenv = require('dotenv');
 const port = 5000;
-
-
+dotenv.config();
 
 const app = express();
 
@@ -26,6 +26,15 @@ app.use(cookieparser())
 mongooseConnect();
 // Routes
 app.use('/', userRoutes);
+
+if (process.env.NODE_ENV === 'production') {
+ 
+  app.use(express.static('client/build'));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
 
 // Start the server
 
