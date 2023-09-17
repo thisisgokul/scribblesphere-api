@@ -15,7 +15,7 @@ const app = express();
 
 app.use(cors({
   credentials: true,
-  origin: 'https://scribblesphere.onrender.com'
+  origin: 'https://scribblesphere-nu.vercel.app'
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
