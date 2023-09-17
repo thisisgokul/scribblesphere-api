@@ -28,10 +28,6 @@ mongooseConnect();
 // Routes
 app.use('/', userRoutes);
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'scribblesphere', 'build', 'index.html'));
-});
-
 // Start the server
 
 app.listen(port, () => {
