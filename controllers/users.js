@@ -8,7 +8,7 @@ dotenv.config();
 const cookieOptions={
   httpOnly:true,
   secure:true,
-  sameSite:'None',
+  sameSite:'strict',
 };
 
 const getAll = (req, res) => {
